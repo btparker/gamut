@@ -1,0 +1,19 @@
+ <!DOCTYPE html>
+   <html>
+     <head>
+       <meta charset="utf-8">
+       <title>My Processing Page</title>
+       <script type="text/javascript" src="processing.js"></script>
+       <script type="text/javascript">
+       function drawSomeText(id) {
+         var pjs = Processing.getInstanceById(id);
+         var text = document.getElementById('inputtext').value;
+         pjs.drawText(text); }
+       </script>
+     </head>
+     <body>
+       <canvas id="mysketch2" data-processing-sources="mysketch2.pde"></canvas>
+       <input type="textfield" value="my text" id="inputtext">
+       <button type="button" onclick="drawSomeText('mysketch2')">place</button>
+     </body>
+</html>
