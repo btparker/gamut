@@ -1,4 +1,5 @@
 /* @pjs preload="FireEquipment.jpg"; */
+/* @pjs preload="colorwheel.png"; */
 
 color backgroundColor;
 
