@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>interactive_gamut_mask : Built with Processing and Processing.js</title>
+		<title>gamut : Built with Processing and Processing.js</title>
 		<link rel="icon"  type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAQAAVzABAEAjBQAaDwYAWjUGAGE6CQBrQQ0ATS8PAFhAJwBUQC8AbFI6AHVXPACBZk4A4NrWAPb19QAAAAAAAMmZmZmZmgAJIwAAAAAAcMIjPjA+PjAKpxIuMDMzMAm0Ii4zMzMACaIiLt3dMAAJtyIuIzPQAAm0Un5yM+IzKLRkfncy4iIotRF+dyLkIiq0QX53F+EiGrQUTkd34iIatEVu7u5iIVrBVVRBRFRVbAtGZGZla2uwAMu7u7u8vADAAwAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIABAADAAwAA" />
 		<meta name="Generator" content="Processing" />
 		<!-- - - - - - - - - - - - - - - - - - - - - 
@@ -37,7 +37,7 @@
 	}
 	#content { 
 		margin: 50px auto 0px auto; padding: 25px 25px 15px 25px;
-		width: 1000px; min-width: 300px; overflow: auto;
+		width: 1050px; min-width: 300px; overflow: auto;
 		border-left: 1px solid #444; border-top: 1px solid #444; 
 		border-right: 1px solid #333; border-bottom: 1px solid #333;
 		background-color: #3d3d3d;
@@ -49,16 +49,15 @@
 		<script src="processing.js" type="text/javascript"></script>
 		<script type="text/javascript">
 // convenience function to get the id attribute of generated sketch html element
-function getProcessingSketchId () { return 'interactivegamutmask'; }
+function getProcessingSketchId () { return 'gamut'; }
 </script>
-<script src="processing.js" type="text/javascript"></script>
 
 	</head>
 	<body>
 		<div id="content">
 			<div>
-				<canvas id="interactivegamutmask" data-processing-sources="interactive_gamut_mask.pde" 
-						width="1000" height="500">
+				<canvas id="gamut" data-processing-sources="gamut.pde" 
+						width="1050" height="500">
 					<p>Your browser does not support the canvas tag.</p>
 					<!-- Note: you can put any alternative content here. -->
 				</canvas>
@@ -66,9 +65,9 @@ function getProcessingSketchId () { return 'interactivegamutmask'; }
 					<p>JavaScript is required to view the contents of this page.</p>
 				</noscript>
 	    	</div>
-			<h1>interactive_gamut_mask</h1>
+			<h1>gamut</h1>
     		<p id="description"></p>
-			<p id="sources">Source code: <a href="interactive_gamut_mask.pde">interactive_gamut_mask</a> <a href="processing.js">processing.js</a> </p>
+			<p id="sources">Source code: <a href="gamut.pde">gamut</a> </p>
 			<p>
 			Built with <a href="http://processing.org" title="Processing">Processing</a>
 			and <a href="http://processingjs.org" title="Processing.js">Processing.js</a>

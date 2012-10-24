@@ -14,7 +14,7 @@
     <center>
       <h1>GAMUT MASKING TOOL</h1>
       <div id="msg"></div>
-      <canvas data-processing-sources="gamut.pde"></canvas>
+      <canvas data-processing-sources="gamutxf.pde"></canvas>
       <script type="application/javascript">
 	var jsmsg = "Hello from JavaScript!";
 	var printMessage = function (msg) {
