@@ -1,5 +1,4 @@
-/* @pjs preload="FireEquipment.jpg"; */
-/* @pjs preload="colorwheel.png"; */
+/* @pjs preload="FireEquipment.jpg,colorwheel.png"; */
 
 color backgroundColor;
 
@@ -19,9 +18,14 @@ void setup() {
   colorWheel = new ColorWheel("colorwheel.png");
   imageAnalyzer = new ImageAnalyzer("FireEquipment.jpg");
   
-  imageAnalyzer.initScan();
+  scan();
   
     
+}
+
+void scan(){
+  imageAnalyzer.initScan();
+  colorWheel.initGamut(imageAnalyzer.getWidth(),imageAnalyzer.getHeight());
 }
 
 void draw(){
@@ -31,7 +35,7 @@ void draw(){
   imageAnalyzer.render();
   popMatrix();
   if(imageAnalyzer.isScanning()){
-    colorWheel.receiveScan(imageAnalyzer.scan());   
+    colorWheel.receiveScan(imageAnalyzer.scan(), imageAnalyzer.getScanningRow());   
   }
 
 }
@@ -96,6 +100,10 @@ class ImageAnalyzer{
       return scanLine.pixels;
   }
   
+  int getScanningRow(){
+    return scanningRow;
+  }
+  
   void render(){
     image(originalImage,0,0);
     if(scanning){
@@ -125,18 +133,21 @@ class ColorWheel{
  
   ColorWheel(String fileName){
     bg = loadImage(fileName); 
-    gm = new GamutMask(500,500);//bg.width,bg.height);
   }
   
-  
+  void initGamut(int w, int h){
+    gm = new GamutMask(bg.width,bg.height,w,h);  
+  }
   
   void render(){
     image(bg,0,0);
-    gm.render();
+    if(gm != null){
+      gm.render();
+    }
   }
   
-  void receiveScan(int[] scannedPixels, int w){
-    gm.receiveScan(scannedPixels,w);  
+  void receiveScan(int[] scannedPixels, int scanningRow){
+    gm.receiveScan(scannedPixels, scanningRow);  
   }
   
   int getWidth(){
@@ -153,11 +164,14 @@ class GamutMask{
   PImage overlay;
   int d;
   int r;
+  int imgW;
+  int imgH;
+  
   PVector center;
   
   PVector[] colorPlots;
   
-  GamutMask(int w, int h){
+  GamutMask(int w, int h,int w2, int h2){
     d = w;
     r = round(w/2);
     center = new PVector(r,r);
@@ -170,10 +184,36 @@ class GamutMask{
     
     pg.loadPixels();
     overlay = pg;
+    
+    
+    imgW = w2;
+    imgH = h2;
+    
+    colorPlots = new PVector[imgW*imgH];
   }
   
-  void receiveScan(int[] scannedPixels, int w){
+  void receiveScan(int[] scannedPixels, int scanningRow){
+    overlay.loadPixels();
+    for(int i = 0; i < imgW; i++){
+      plotColor(scannedPixels[i]);
       
+    }   
+    overlay.updatePixels();
+  }
+  
+  void plotColor(int scannedColor){ 
+    float angle = hue(scannedColor);
+    float radial = saturation(scannedColor);
+    
+    float xUnitVal = radial*cos(angle);
+    float yUnitVal = radial*sin(angle);
+    
+    int xVal = round(xUnitVal*imgW+center.x);
+    int yVal = round(yUnitVal*imgH+center.y);
+    
+    overlay.set(xVal,yVal,color(0,0,0,0));
+    
+    
   }
 
   void render(){
