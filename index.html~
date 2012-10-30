@@ -10,9 +10,38 @@
     
     
   <body>
+
     <center>
       <h1>GAMUT MASKING TOOL</h1>
-      <canvas data-processing-sources="interactive_gamut_mask.pde"></canvas>
+      <div id="msg"></div>
+      <canvas data-processing-target="gamut.pde"></canvas>
+      <button onclick="startSketch();">
+          Start</button>
+      <button onclick="stopSketch();">
+          Stop</button>
+      <script type="application/javascript">
+          var processingInstance;
+  
+          function startSketch() {
+              switchSketchState(true);
+          }
+  
+          function stopSketch() {
+              switchSketchState(false);
+          }
+  
+          function switchSketchState(on) {
+              if (!processingInstance) {
+                  processingInstance = Processing.getInstanceById('sketch');
+              }
+  
+              if (on) {
+                  processingInstance.loop();  // call Processing loop() function
+              } else {
+                  processingInstance.noLoop(); // stop animation, call noLoop()
+              }
+          }
+      </script>
     </center>
   </body>
 </html>

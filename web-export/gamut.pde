@@ -2,8 +2,11 @@
 
 color backgroundColor;
 
-ImageAnalyzer imageAnalyzer;
-ColorWheel colorWheel;
+ImageLoader imageLoader;
+PImage colorWheel;
+GamutMask gamutMask;
+
+static final int OVERLAY_OPACITY = 200;
 
 void setup() {
   size(1050,500);
@@ -15,189 +18,109 @@ void setup() {
   
   smooth();
   
-  colorWheel = new ColorWheel("colorwheel.png");
-  imageAnalyzer = new ImageAnalyzer("FireEquipment.jpg");
+  colorWheel = loadImage("colorwheel.png");
+  imageLoader = new ImageLoader("FireEquipment.jpg", colorWheel.width, colorWheel.height);
   
-  scan();
-  
+  //scan();
     
 }
 
-void scan(){
-  imageAnalyzer.initScan();
-  colorWheel.initGamut(imageAnalyzer.getWidth(),imageAnalyzer.getHeight());
+void uploadImage(String filename){
+  background(backgroundColor);
+  imageLoader = new ImageLoader(filename, colorWheel.width, colorWheel.height);  
+  gamutMask = null;
+}
+
+void scanImage(){
+  gamutMask = new GamutMask(colorWheel.width,colorWheel.height,imageLoader.getImage());
 }
 
 void draw(){
-  colorWheel.render();
+  image(colorWheel,0,0);
+  if(gamutMask){
+    gamutMask.render();
+  }
   pushMatrix();
-  translate(imageAnalyzer.getWidth()+50,0);
-  imageAnalyzer.render();
+  translate(colorWheel.width+50,0);
+  imageLoader.render();
   popMatrix();
-  if(imageAnalyzer.isScanning()){
-    colorWheel.receiveScan(imageAnalyzer.scan(), imageAnalyzer.getScanningRow());   
-  }
 
 }
 
 
 
 
-class ImageAnalyzer{
+class ImageLoader{
   //Loaded image, unaltered
-  PImage originalImage;
+  PImage img;
+  int w,h;
+  int sw,sh;
+  int tx,ty;
   
-  //Color changed image
-  PImage alteredImage;
   
-  //Single row image to show 'scanning line'
-  PImage scanLine;
-  int scanningRow;
-  
-  //Dark overlay to show unscanned image
-  PGraphics overlay;
-  
-  boolean scanning;
-  
-  ImageAnalyzer(String fileName){
-    originalImage = loadImage(fileName); 
-    scanning = false;
+  ImageLoader(String fileName,int w, int h){
+    img = loadImage(fileName);
+    this.w = w;
+    this.h = h;
+    
+        
   }
   
-  void initScan(){
-    scanning = true;
-    scanLine = createImage(originalImage.width, 1, RGB);
-    overlay = createGraphics(originalImage.width, originalImage.height,P2D);
-    overlay.beginDraw();
-    overlay.noStroke();
-    overlay.fill(0,0,0,200);
-    overlay.rect(0,0,originalImage.width,originalImage.height);
-    overlay.endDraw();
+  PImage getImage(){
+    return img;  
   }
-  
-  int[] scan(){
-      originalImage.loadPixels();
-      scanLine.loadPixels();
-      color scanColor;
-      for(int i = 0; i < originalImage.width; i++){
-        scanLine.pixels[i]= color(hue(originalImage.pixels[originalImage.height*scanningRow+i]),saturation(originalImage.pixels[originalImage.height*scanningRow+i]),1.0);
-      }
-      originalImage.updatePixels();
-      scanLine.updatePixels();
-      scanningRow++;
-      
-      overlay.beginDraw();
-      overlay.noStroke();
-      overlay.background(0,0,0,0);
-      overlay.fill(0,0,0,200);
-      overlay.rect(0,scanningRow,originalImage.width,originalImage.height-scanningRow);
-      overlay.endDraw();
-      
-      if(scanningRow >= originalImage.height){
-        scanning = false;
-      }
-      
-      return scanLine.pixels;
-  }
-  
-  int getScanningRow(){
-    return scanningRow;
-  }
-  
-  void render(){
-    image(originalImage,0,0);
-    if(scanning){
-      image(overlay,0,0);
-      image(scanLine,0,scanningRow-1); 
-      image(scanLine,0,scanningRow); 
-      image(scanLine,0,scanningRow+1); 
-    }
-  }
-  
-  int getWidth(){
-    return originalImage.width;
-  }
-  
-  int getHeight(){
-    return originalImage.height; 
-  }
-  
-  boolean isScanning(){
-    return scanning; 
-  }
-}
 
-class ColorWheel{
-  PImage bg;
-  GamutMask gm;
- 
-  ColorWheel(String fileName){
-    bg = loadImage(fileName); 
-  }
-  
-  void initGamut(int w, int h){
-    gm = new GamutMask(bg.width,bg.height,w,h);  
-  }
-  
   void render(){
-    image(bg,0,0);
-    if(gm != null){
-      gm.render();
+    if(!sh){
+      sh = w*img.height/img.width;
+      sw = w;
+      if(sh > h){
+        sh = h;
+        sw = h*img.width/img.height;
+      }
+    
+      tx = round((w-sw)/2.0);
+      ty = round((h-sh)/2.0);
     }
-  }
-  
-  void receiveScan(int[] scannedPixels, int scanningRow){
-    gm.receiveScan(scannedPixels, scanningRow);  
-  }
-  
-  int getWidth(){
-    return bg.width;
-  }
-  
-  int getHeight(){
-    return bg.height; 
+    image(img,tx,ty,sw,sh);
   }
 }
 
 class GamutMask{
   PGraphics pg;
   PImage overlay;
+  PImage img;
   int d;
   int r;
-  int imgW;
-  int imgH;
   
   PVector center;
   
   PVector[] colorPlots;
   
-  GamutMask(int w, int h,int w2, int h2){
+  GamutMask(int w, int h, PImage img){
+    this.img = img;
     d = w;
     r = round(w/2);
     center = new PVector(r,r);
     pg = createGraphics(w,h, P2D);
     pg.beginDraw();
     pg.noStroke();
-    pg.fill(0,0,0,200);
+    pg.fill(0,0,0,OVERLAY_OPACITY);
     pg.ellipse(w/2, h/2, w, h);
     pg.endDraw();
     
     pg.loadPixels();
     overlay = pg;
     
-    
-    imgW = w2;
-    imgH = h2;
-    
-    colorPlots = new PVector[imgW*imgH];
-  }
-  
-  void receiveScan(int[] scannedPixels, int scanningRow){
+    colorPlots = new PVector[img.width*img.height];
     overlay.loadPixels();
-    for(int i = 0; i < imgW; i++){
-      plotColor(scannedPixels[i]);
-      
+    img.loadPixels();
+    for(int j = 0; j < img.height; j++){
+      for(int i = 0; i < img.width; i++){
+        plotColor(img.pixels[j*img.width+i]);
+      } 
     }   
+    img.updatePixels();
     overlay.updatePixels();
   }
   
@@ -208,8 +131,9 @@ class GamutMask{
     float xUnitVal = radial*cos(angle);
     float yUnitVal = radial*sin(angle);
     
-    int xVal = round(xUnitVal*imgW+center.x);
-    int yVal = round(yUnitVal*imgH+center.y);
+    float xVal = xUnitVal*d+center.x;
+    float yVal = yUnitVal*d+center.y;
+    
     
     overlay.set(xVal,yVal,color(0,0,0,0));
     

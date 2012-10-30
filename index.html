@@ -13,13 +13,21 @@
 
     <center>
       <h1>GAMUT MASKING TOOL</h1>
-      <div id="msg"></div>
-      <canvas data-processing-sources="gamut.pde"></canvas>
+      <canvas id="sketch" data-processing-sources="gamut.pde"></canvas>
+      <button type="button" onclick="startScan();">
+          Start Scan
+      </button>
       <script type="application/javascript">
-	var jsmsg = "Hello from JavaScript!";
-	var printMessage = function (msg) {
-        document.getElementById('msg').innerHTML = "Message: " + msg;
-        };
+        var processingInstance;
+        
+        function startScan() {
+        if (!processingInstance) {
+        processingInstance = Processing.getInstanceById('sketch');
+        }
+        
+        processingInstance.scan();  // call Processing loop() function
+        
+        }
       </script>
     </center>
   </body>

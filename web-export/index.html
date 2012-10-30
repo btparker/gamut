@@ -61,8 +61,13 @@ function getProcessingSketchId () { return 'gamut'; }
 					<p>Your browser does not support the canvas tag.</p>
 					<!-- Note: you can put any alternative content here. -->
 				</canvas>
+                <button onclick="startScan();">Start Scan</button>
+                <input type="file" id="files" name="files[]" single />
+                <output id="list"></output>
+                <script src="gamuthelper.js" type="text/javascript"></script>
+
 				<noscript>
-					<p>JavaScript is required to view the contents of this page.</p>
+					<p>JavaScript is required to view the contents of this page.</p> 
 				</noscript>
 	    	</div>
 			<h1>gamut</h1>
